@@ -20,7 +20,14 @@ public class FirebaseConfig {
     @PostConstruct
     public void initialize() {
         try {
-            InputStream serviceAccount = new ClassPathResource("firebase-service-account.json").getInputStream();
+            InputStream serviceAccount;
+            String firebaseEnvJson = System.getenv("FIREBASE_SERVICE_ACCOUNT");
+            
+            if (firebaseEnvJson != null && !firebaseEnvJson.trim().isEmpty()) {
+                serviceAccount = new java.io.ByteArrayInputStream(firebaseEnvJson.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            } else {
+                serviceAccount = new ClassPathResource("firebase-service-account.json").getInputStream();
+            }
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
